@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+          http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.0.xsd
+          http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-4.0.xsd">
+
+
+	<mvc:annotation-driven>
+		<!-- 设置请求编码 -->
+		<mvc:message-converters register-defaults="true">
+			<bean class="org.springframework.http.converter.StringHttpMessageConverter">
+				<property name="supportedMediaTypes" value="text/plain;charset=UTF-8" />
+			</bean>
+		</mvc:message-converters>
+	</mvc:annotation-driven>
+	<context:component-scan base-package="com.erliangcun.web.controll"></context:component-scan>
+	<!-- 设置解析对应的页面 -->
+	<bean
+		class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<property name="prefix" value="/WEB-INF/views/"></property>
+		<property name="suffix" value=".jsp"></property>
+	</bean>
+	
+	<!--配置拦截器, 多个拦截器,顺序执行 -->  
+	<mvc:interceptors>    
+	    <mvc:interceptor>    
+	        <!-- 匹配的是url路径， 如果不配置或/**,将拦截所有的Controller -->  
+	        <mvc:mapping path="/" />  
+	        <mvc:mapping path="/shop/**" />  
+	        <bean class="com.erliangcun.web.interceptor.ShopInterceptor"></bean>    
+	    </mvc:interceptor>  
+	    <!-- 当设置多个拦截器时，先按顺序调用preHandle方法，然后逆序调用每个拦截器的postHandle和afterCompletion方法 -->  
+	</mvc:interceptors>  
+	
+	<!-- 设置可以静态访问的资源 -->
+	<mvc:resources mapping="/images/**" location="/WEB-INF/views/" cache-period="31556926"/> 
+	<mvc:resources mapping="/js/**" location="/static_resources/javascript/"/>    
+	<mvc:resources mapping="/styles/**" location="/static_resources/css/"/>
+	 
+	<!-- 定义个缺省的控制适配器 -->  
+    <bean  
+       class="org.springframework.web.servlet.mvc.SimpleControllerHandlerAdapter"/>  
+    <!-- 获取配置文件 -->  
+    <bean id="config"  
+       class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">  
+       <property name="locations">  
+           <list>  
+              <value>classpath:db-config.properties</value>  
+           </list>  
+       </property>  
+    </bean>  
+    
+    <!--  图片上传 -->
+	<!-- SpringMVC上传文件时，需要配置MultipartResolver处理器 -->
+	<bean id="multipartResolver"
+		class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+		<property name="defaultEncoding" value="UTF-8" />
+		<!-- 指定所上传文件的总大小,单位字节。注意maxUploadSize属性的限制不是针对单个文件，而是所有文件的容量之和 -->
+		<property name="maxUploadSize" value="10240000" />
+	</bean>
+    <!-- 获取数据源 -->  
+    <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">  
+       <property name="driverClassName">  
+           <value>${db.dirverClass}</value>  
+       </property>  
+       <property name="url">  
+           <value>${db.url}</value>  
+       </property>  
+       <property name="username">  
+           <value>${db.username}</value>  
+       </property>  
+       <property name="password">  
+           <value>${db.password}</value>  
+       </property>  
+    </bean>
+
+	<bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+		<constructor-arg ref="dataSource" />
+	</bean>
+
+    <bean id="shopDao" class="com.erliangcun.dao.impl.ShopDaoImpl"> 
+   	 	<property name="jdbcTemplate" ref="jdbcTemplate"></property> 
+    </bean> 
+    
+     <bean id="shopService" class="com.erliangcun.service.impl.ShopServiceImpl"> 
+       <property name="shopDao">  
+           <ref bean="shopDao"/>  
+       </property>  
+    </bean>  
+    
+      <!--定义控制器-->  
+    <bean id="shopControll" class="com.erliangcun.web.controll.ShopControll">  
+       <property name="shopService">  
+           <ref bean="shopService"/>  
+       </property>  
+    </bean>  
+    
+    
+</beans>

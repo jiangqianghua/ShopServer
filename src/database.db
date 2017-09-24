@@ -1,0 +1,62 @@
+CREATE DATABASE erliangcun character set utf8;
+
+---
+CREATE TABLE shop (
+	id INTEGER NOT NULL AUTO_INCREMENT,
+	name VARCHAR(20) NOT NULL,
+	address VARCHAR(255) NOT NULL,
+	start_time BIGINT NOT NULL,
+	end_time BIGINT NOT NULL,
+	latitude BIGINT NOT NULL,
+	longitude BIGINT NOT NULL,
+	PRIMARY KEY  (`id`)
+) default charset = utf8;
+---
+CREATE TABLE food (
+	id INTEGER NOT NULL AUTO_INCREMENT,
+	name VARCHAR(20) NOT NULL,
+	imageurl VARCHAR(255),
+	num INTEGER NOT NULL,
+	price DOUBLE NOT NULL,
+	des VARCHAR(255),
+	shopid TINYINT NOT NULL,
+	type TINYINT NOT NULL,
+	PRIMARY KEY  (`id`)
+) default charset = utf8;
+гнгнгнгн
+CREATE TABLE userorder(
+	id VARCHAR(255) NOT NULL,
+	user_name VARCHAR(20) NOT NULL,
+	address VARCHAR(255) NOT NULL ,
+	payment DOUBLE NOT NULL ,
+	iphone VARCHAR(20) NOT NULL,
+	status TINYINT NOT NULL,
+	PRIMARY KEY  (`id`)
+) default charset = utf8;
+---
+CREATE TABLE orderdetail(
+	id INTEGER NOT NULL AUTO_INCREMENT,
+	order_id VARCHAR(255) NOT NULL,
+	name VARCHAR(255) NOT NULL , 
+	price DOUBLE NOT NULL ,
+	num INTEGER NOT NULL ,
+	PRIMARY KEY  (`id`) ,
+	FOREIGN KEY(order_id) references userorder(id)
+) default charset = utf8;
+
+
+
+insert into shop(name,address,start_time,end_time,latitude,longitude) values("duanpu1","beijin",100,100,100,100);
+insert into userorder(id,user_name,address,payment,iphone,status) values("201701101","jiangqianghua","beijing",20.5,"15801523721",1);
+insert into orderdetail(order_id,name,price,num) values("201701101","baocai",12,1);
+insert into orderdetail(order_id,name,price,num) values("201701101","qingcai",8.5,1);
+/------------change mysql to utf-8 ways-------------
+set character_set_client = utf8;
+set character_set_server = utf8;
+set character_set_connection = utf8;
+set character_set_database = utf8;
+set character_set_results = utf8;
+set collation_connection = utf8_general_ci;
+set collation_database = utf8_general_ci;
+set collation_server = utf8_general_ci;
+
